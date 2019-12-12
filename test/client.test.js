@@ -415,34 +415,6 @@ describe('client.test.js', function() {
     });
   });
 
-  describe('beginDoomedTransactionScope(scope)', function() {
-
-    it('should insert 0 rows in a doomed transaction with ctx', function* () {
-      const ctx = {};
-      const db = this.db;
-
-      function* insert() {
-        return yield db.beginDoomedTransactionScope(function* (conn) {
-          yield conn.query('insert into ??(name, email, gmt_create, gmt_modified) \
-            values(?, ?, now(), now())',
-            [ table, prefix + 'beginDoomedTransactionScopeCtx1', prefix + 'm@beginDoomedTransactionScopeCtx1.com' ]);
-          yield conn.query('insert into ??(name, email, gmt_create, gmt_modified) \
-            values(?, ?, now(), now())',
-            [ table, prefix + 'beginDoomedTransactionScopeCtx2', prefix + 'm@beginDoomedTransactionScopeCtx1.com' ]);
-          return true;
-        }, ctx);
-      }
-
-      yield insert();
-
-      const rows = yield db.query('select * from ?? where email=? order by id',
-        [ table, prefix + 'm@beginDoomedTransactionScopeCtx1.com' ]);
-      assert.equal(rows.length, 0);
-      assert.equal(ctx._transactionConnection, null);
-      assert.equal(ctx._transactionScopeCount, 0);
-    });
-  });
-
   describe('get(table, obj, options), select(table, options)', function() {
     before(function* () {
       let result = yield this.db.insert(table, {
@@ -456,50 +428,43 @@ describe('client.test.js', function() {
         email: prefix + 'm@fengmk2-get.com',
       });
       assert.equal(result.affectedRows, 1);
-
-      result = yield this.db.insert(table, {
-        name: prefix + 'fengmk-mobile-get',
-        email: prefix + 'm@fengmk2-mobile-get.com',
-        mobile: prefix + '13800000000',
-      });
-      assert.equal(result.affectedRows, 1);
-    });
-
-    it('should get support NULL value', function* () {
-      let user = yield this.db.get(table, { mobile: null });
-      assert(user);
-      assert(user.mobile === null);
-      user = yield this.db.get(table, { mobile: undefined });
-      assert(user);
-      assert(user.mobile === null);
-      user = yield this.db.get(table, { mobile: prefix + '13800000000' });
-      assert(user);
-      assert(user.mobile === prefix + '13800000000');
     });
 
     it('should get exists object without columns', function* () {
-      let user = yield this.db.get(table, { email: prefix + 'm@fengmk2-get.com' });
+      let user = yield this.db.get(table, {
+        email: prefix + 'm@fengmk2-get.com',
+      });
       assert(user);
-      assert.deepEqual(Object.keys(user), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email', 'mobile' ]);
+      assert.deepEqual(Object.keys(user), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email' ]);
       assert.equal(user.name, prefix + 'fengmk2-get');
 
-      user = yield this.db.get(table, { email: prefix + 'm@fengmk2-get.com' }, {
-        orders: [[ 'id', 'desc' ]],
+      user = yield this.db.get(table, {
+        email: prefix + 'm@fengmk2-get.com',
+      }, {
+        orders: [
+          [ 'id', 'desc' ],
+        ],
       });
       assert(user);
-      assert.deepEqual(Object.keys(user), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email', 'mobile' ]);
+      assert.deepEqual(Object.keys(user), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email' ]);
       assert.equal(user.name, prefix + 'fengmk3-get');
 
-      user = yield this.db.get(table, { email: prefix + 'm@fengmk2-get.com' }, {
-        orders: [[ 'id', 'desc' ], 'gmt_modified', [ 'gmt_create', 'asc' ]],
+      user = yield this.db.get(table, {
+        email: prefix + 'm@fengmk2-get.com',
+      }, {
+        orders: [
+          [ 'id', 'desc' ], 'gmt_modified', [ 'gmt_create', 'asc' ],
+        ],
       });
       assert(user);
-      assert.deepEqual(Object.keys(user), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email', 'mobile' ]);
+      assert.deepEqual(Object.keys(user), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email' ]);
       assert.equal(user.name, prefix + 'fengmk3-get');
     });
 
     it('should get exists object with columns', function* () {
-      const user = yield this.db.get(table, { email: prefix + 'm@fengmk2-get.com' }, {
+      const user = yield this.db.get(table, {
+        email: prefix + 'm@fengmk2-get.com',
+      }, {
         columns: [ 'id', 'name' ],
       });
       assert(user);
@@ -508,7 +473,9 @@ describe('client.test.js', function() {
     });
 
     it('should get null when row not exists', function* () {
-      const user = yield this.db.get(table, { email: prefix + 'm@fengmk2-get-not-exists.com' }, {
+      const user = yield this.db.get(table, {
+        email: prefix + 'm@fengmk2-get-not-exists.com',
+      }, {
         columns: [ 'id', 'name' ],
       });
       assert.strictEqual(user, null);
@@ -516,37 +483,51 @@ describe('client.test.js', function() {
 
     it('should select objects without columns', function* () {
       let users = yield this.db.select(table, {
-        where: { email: prefix + 'm@fengmk2-get.com' },
+        where: {
+          email: prefix + 'm@fengmk2-get.com',
+        },
       });
       assert(users);
       assert.equal(users.length, 2);
-      assert.deepEqual(Object.keys(users[0]), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email', 'mobile' ]);
+      assert.deepEqual(Object.keys(users[0]), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email' ]);
       assert.equal(users[0].name, prefix + 'fengmk2-get');
 
       users = yield this.db.select(table, {
-        where: { email: prefix + 'm@fengmk2-get.com' },
-        orders: [[ 'id', 'desc' ]],
+        where: {
+          email: prefix + 'm@fengmk2-get.com',
+        },
+        orders: [
+          [ 'id', 'desc' ],
+        ],
         limit: 1,
       });
       assert(users);
       assert.equal(users.length, 1);
-      assert.deepEqual(Object.keys(users[0]), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email', 'mobile' ]);
+      assert.deepEqual(Object.keys(users[0]), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email' ]);
       assert.equal(users[0].name, prefix + 'fengmk3-get');
 
       users = yield this.db.select(table, {
-        where: { email: prefix + 'm@fengmk2-get.com' },
-        orders: [[ 'id', 'desc' ]],
+        where: {
+          email: prefix + 'm@fengmk2-get.com',
+        },
+        orders: [
+          [ 'id', 'desc' ],
+        ],
         limit: 1,
         offset: 1,
       });
       assert(users);
       assert.equal(users.length, 1);
-      assert.deepEqual(Object.keys(users[0]), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email', 'mobile' ]);
+      assert.deepEqual(Object.keys(users[0]), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email' ]);
       assert.equal(users[0].name, prefix + 'fengmk2-get');
 
       users = yield this.db.select(table, {
-        where: { email: prefix + 'm@fengmk2-get.com' },
-        orders: [[ 'id', 'desc' ]],
+        where: {
+          email: prefix + 'm@fengmk2-get.com',
+        },
+        orders: [
+          [ 'id', 'desc' ],
+        ],
         limit: 10,
         offset: 100,
       });
@@ -558,7 +539,7 @@ describe('client.test.js', function() {
       const users = yield this.db.select(table);
       assert(users);
       assert.equal(users.length > 2, true);
-      assert.deepEqual(Object.keys(users[0]), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email', 'mobile' ]);
+      assert.deepEqual(Object.keys(users[0]), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email' ]);
     });
 
     it('should select with options.orders', function* () {
@@ -569,7 +550,9 @@ describe('client.test.js', function() {
       assert(users[0].id < users[1].id);
 
       users = yield this.db.select(table, {
-        orders: [[ 'id', 'desc' ], null, 1 ],
+        orders: [
+          [ 'id', 'desc' ], null, 1,
+        ],
       });
       assert(users.length >= 2);
       assert(users[0].id > users[1].id);
@@ -603,39 +586,41 @@ describe('client.test.js', function() {
     });
 
     it('should insert multi rows', function* () {
-      const result = yield this.db.insert(table, [
-        {
-          name: prefix + 'fengmk2-insert2',
-          email: prefix + 'm@fengmk2-insert.com',
-        },
-        {
-          name: prefix + 'fengmk2-insert3',
-          email: prefix + 'm@fengmk2-insert.com',
-        },
+      const result = yield this.db.insert(table, [{
+        name: prefix + 'fengmk2-insert2',
+        email: prefix + 'm@fengmk2-insert.com',
+      },
+      {
+        name: prefix + 'fengmk2-insert3',
+        email: prefix + 'm@fengmk2-insert.com',
+      },
       ]);
       assert.equal(result.affectedRows, 2);
-      const row = yield this.db.get(table, { id: result.insertId });
+      const row = yield this.db.get(table, {
+        id: result.insertId,
+      });
       assert(row);
       assert.equal(row.id, result.insertId);
     });
 
     it('should insert multi fail', function* () {
       try {
-        yield this.db.insert(table, [
-          {
-            name: prefix + 'fengmk2-insert4',
-            email: prefix + 'm@fengmk2-insert.com',
-          },
-          {
-            name: prefix + 'fengmk2-insert4',
-            email: prefix + 'm@fengmk2-insert.com',
-          },
+        yield this.db.insert(table, [{
+          name: prefix + 'fengmk2-insert4',
+          email: prefix + 'm@fengmk2-insert.com',
+        },
+        {
+          name: prefix + 'fengmk2-insert4',
+          email: prefix + 'm@fengmk2-insert.com',
+        },
         ]);
         throw new Error('should not run this');
       } catch (err) {
         assert.equal(err.code, 'ER_DUP_ENTRY');
       }
-      const row = yield this.db.get(table, { name: prefix + 'fengmk2-insert4' });
+      const row = yield this.db.get(table, {
+        name: prefix + 'fengmk2-insert4',
+      });
       assert(!row);
     });
 
@@ -646,7 +631,9 @@ describe('client.test.js', function() {
       });
       assert.equal(result.affectedRows, 1);
       let rows = yield this.db.select(table, {
-        where: { name: prefix + 'fengmk2-insert-no-tran' },
+        where: {
+          name: prefix + 'fengmk2-insert-no-tran',
+        },
       });
       assert.equal(rows.length, 1);
 
@@ -660,7 +647,9 @@ describe('client.test.js', function() {
         assert.equal(err.code, 'ER_DUP_ENTRY');
       }
       rows = yield this.db.select(table, {
-        where: { name: prefix + 'fengmk2-insert-no-tran' },
+        where: {
+          name: prefix + 'fengmk2-insert-no-tran',
+        },
       });
       assert.equal(rows.length, 1);
     });
@@ -674,7 +663,9 @@ describe('client.test.js', function() {
         });
         assert.equal(result.affectedRows, 1);
         const rows = yield tran.select(table, {
-          where: { name: prefix + 'fengmk2-insert-has-tran' },
+          where: {
+            name: prefix + 'fengmk2-insert-has-tran',
+          },
         });
         assert.equal(rows.length, 1);
 
@@ -690,7 +681,9 @@ describe('client.test.js', function() {
       }
 
       const rows = yield this.db.select(table, {
-        where: { name: prefix + 'fengmk2-insert-has-tran' },
+        where: {
+          name: prefix + 'fengmk2-insert-has-tran',
+        },
       });
       assert.equal(rows.length, 0);
     });
@@ -731,7 +724,9 @@ describe('client.test.js', function() {
       const result = yield this.db.update(table, user);
       assert.equal(result.affectedRows, 1);
 
-      const row = yield this.db.get(table, { id: user.id });
+      const row = yield this.db.get(table, {
+        id: user.id,
+      });
       assert.equal(row.email, user.email);
     });
 
@@ -744,8 +739,7 @@ describe('client.test.js', function() {
       let result = yield this.db.update(table, {
         name: prefix + 'fengmk2-update',
         email: prefix + 'm@fengmk2-update2.com',
-        // gmt_create: 'now()', // invalid date, will throw error now
-        gmt_create: this.db.literals.now,
+        gmt_create: 'now()', // invalid date
         gmt_modified: this.db.literals.now,
       }, {
         where: {
@@ -758,16 +752,17 @@ describe('client.test.js', function() {
         name: prefix + 'fengmk2-update',
       });
       assert.equal(user.email, prefix + 'm@fengmk2-update2.com');
-      // assert.equal(user.gmt_create, '0000-00-00 00:00:00');
+      assert.equal(user.gmt_create, '0000-00-00 00:00:00');
       assert(user.gmt_modified instanceof Date);
-      assert(user.gmt_create instanceof Date);
 
       user.email = prefix + 'm@fengmk2-update3.com';
       result = yield this.db.update(table, user, {
         columns: [ 'email' ],
       });
       assert.equal(result.affectedRows, 1);
-      const row = yield this.db.get(table, { id: user.id });
+      const row = yield this.db.get(table, {
+        id: user.id,
+      });
       assert.equal(row.email, user.email);
     });
   });
@@ -789,16 +784,22 @@ describe('client.test.js', function() {
     });
 
     it('should delete exists rows', function* () {
-      const result = yield this.db.delete(table, { email: prefix + 'm@fengmk2-delete.com' });
+      const result = yield this.db.delete(table, {
+        email: prefix + 'm@fengmk2-delete.com',
+      });
       assert.equal(result.affectedRows, 2);
       assert.equal(result.insertId, 0);
 
-      const user = yield this.db.get(table, { email: prefix + 'm@fengmk2-delete.com' });
+      const user = yield this.db.get(table, {
+        email: prefix + 'm@fengmk2-delete.com',
+      });
       assert(!user);
     });
 
     it('should delete not exists rows', function* () {
-      const result = yield this.db.delete(table, { email: prefix + 'm@fengmk2-delete-not-exists.com' });
+      const result = yield this.db.delete(table, {
+        email: prefix + 'm@fengmk2-delete-not-exists.com',
+      });
       assert.equal(result.affectedRows, 0);
       assert.equal(result.insertId, 0);
     });
@@ -870,7 +871,9 @@ describe('client.test.js', function() {
       });
       assert.equal(count, 2);
 
-      count = yield this.db.count(table, { id: -1 });
+      count = yield this.db.count(table, {
+        id: -1,
+      });
       assert.equal(count, 0);
     });
   });

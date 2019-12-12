@@ -1,25 +1,4 @@
 
-3.3.1 / 2019-04-24
-==================
-
-**fixes**
-  * [[`52147de`](git@github.com:ali-sdk/ali-rds/commit/52147de9d7405b02efcf84ef28a11a4097675972)] - fix: query parameters are not allowed to be included in where (#67) (Hoyt <<hoythan@gmail.com>>)
-
-**others**
-  * [[`0f9f23b`](git@github.com:ali-sdk/ali-rds/commit/0f9f23bbd935650a1440537b18aaa982a6db2d44)] - chore: remove node 4 in ci (dead-horse <<dead_horse@qq.com>>)
-
-3.3.0 / 2018-12-11
-==================
-
-**features**
-  * [[`0d4d4ab`](http://github.com/ali-sdk/ali-rds/commit/0d4d4ab99a7cd655180f22d4d95e3cfef8c8714b)] - feat: where condition support NULL value (#60) (fengmk2 <<fengmk2@gmail.com>>)
-
-3.2.0 / 2018-11-19
-==================
-
-**features**
-  * [[`b227bc1`](http://github.com/ali-sdk/ali-rds/commit/b227bc12e5c6252264d4761b72f915b73d53c688)] - feat: support doomed transaction scope on test cases (#58) (AngrySean <<xujihui1985@gmail.com>>)
-
 3.1.0 / 2018-09-30
 ==================
 

@@ -438,28 +438,40 @@ describe('async.test.js', function() {
     });
 
     it('should get exists object without columns', async function() {
-      let user = await this.db.get(table, { email: prefix + 'm@fengmk2-get.com' });
+      let user = await this.db.get(table, {
+        email: prefix + 'm@fengmk2-get.com',
+      });
       assert(user);
-      assert.deepEqual(Object.keys(user), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email', 'mobile' ]);
+      assert.deepEqual(Object.keys(user), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email' ]);
       assert.equal(user.name, prefix + 'fengmk2-get');
 
-      user = await this.db.get(table, { email: prefix + 'm@fengmk2-get.com' }, {
-        orders: [[ 'id', 'desc' ]],
+      user = await this.db.get(table, {
+        email: prefix + 'm@fengmk2-get.com',
+      }, {
+        orders: [
+          [ 'id', 'desc' ],
+        ],
       });
       assert(user);
-      assert.deepEqual(Object.keys(user), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email', 'mobile' ]);
+      assert.deepEqual(Object.keys(user), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email' ]);
       assert.equal(user.name, prefix + 'fengmk3-get');
 
-      user = await this.db.get(table, { email: prefix + 'm@fengmk2-get.com' }, {
-        orders: [[ 'id', 'desc' ], 'gmt_modified', [ 'gmt_create', 'asc' ]],
+      user = await this.db.get(table, {
+        email: prefix + 'm@fengmk2-get.com',
+      }, {
+        orders: [
+          [ 'id', 'desc' ], 'gmt_modified', [ 'gmt_create', 'asc' ],
+        ],
       });
       assert(user);
-      assert.deepEqual(Object.keys(user), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email', 'mobile' ]);
+      assert.deepEqual(Object.keys(user), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email' ]);
       assert.equal(user.name, prefix + 'fengmk3-get');
     });
 
     it('should get exists object with columns', async function() {
-      const user = await this.db.get(table, { email: prefix + 'm@fengmk2-get.com' }, {
+      const user = await this.db.get(table, {
+        email: prefix + 'm@fengmk2-get.com',
+      }, {
         columns: [ 'id', 'name' ],
       });
       assert(user);
@@ -468,7 +480,9 @@ describe('async.test.js', function() {
     });
 
     it('should get null when row not exists', async function() {
-      const user = await this.db.get(table, { email: prefix + 'm@fengmk2-get-not-exists.com' }, {
+      const user = await this.db.get(table, {
+        email: prefix + 'm@fengmk2-get-not-exists.com',
+      }, {
         columns: [ 'id', 'name' ],
       });
       assert.strictEqual(user, null);
@@ -476,37 +490,51 @@ describe('async.test.js', function() {
 
     it('should select objects without columns', async function() {
       let users = await this.db.select(table, {
-        where: { email: prefix + 'm@fengmk2-get.com' },
+        where: {
+          email: prefix + 'm@fengmk2-get.com',
+        },
       });
       assert(users);
       assert.equal(users.length, 2);
-      assert.deepEqual(Object.keys(users[0]), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email', 'mobile' ]);
+      assert.deepEqual(Object.keys(users[0]), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email' ]);
       assert.equal(users[0].name, prefix + 'fengmk2-get');
 
       users = await this.db.select(table, {
-        where: { email: prefix + 'm@fengmk2-get.com' },
-        orders: [[ 'id', 'desc' ]],
+        where: {
+          email: prefix + 'm@fengmk2-get.com',
+        },
+        orders: [
+          [ 'id', 'desc' ],
+        ],
         limit: 1,
       });
       assert(users);
       assert.equal(users.length, 1);
-      assert.deepEqual(Object.keys(users[0]), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email', 'mobile' ]);
+      assert.deepEqual(Object.keys(users[0]), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email' ]);
       assert.equal(users[0].name, prefix + 'fengmk3-get');
 
       users = await this.db.select(table, {
-        where: { email: prefix + 'm@fengmk2-get.com' },
-        orders: [[ 'id', 'desc' ]],
+        where: {
+          email: prefix + 'm@fengmk2-get.com',
+        },
+        orders: [
+          [ 'id', 'desc' ],
+        ],
         limit: 1,
         offset: 1,
       });
       assert(users);
       assert.equal(users.length, 1);
-      assert.deepEqual(Object.keys(users[0]), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email', 'mobile' ]);
+      assert.deepEqual(Object.keys(users[0]), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email' ]);
       assert.equal(users[0].name, prefix + 'fengmk2-get');
 
       users = await this.db.select(table, {
-        where: { email: prefix + 'm@fengmk2-get.com' },
-        orders: [[ 'id', 'desc' ]],
+        where: {
+          email: prefix + 'm@fengmk2-get.com',
+        },
+        orders: [
+          [ 'id', 'desc' ],
+        ],
         limit: 10,
         offset: 100,
       });
@@ -518,7 +546,7 @@ describe('async.test.js', function() {
       const users = await this.db.select(table);
       assert(users);
       assert.equal(users.length > 2, true);
-      assert.deepEqual(Object.keys(users[0]), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email', 'mobile' ]);
+      assert.deepEqual(Object.keys(users[0]), [ 'id', 'gmt_create', 'gmt_modified', 'name', 'email' ]);
     });
 
     it('should select with options.orders', async function() {
@@ -529,7 +557,9 @@ describe('async.test.js', function() {
       assert(users[0].id < users[1].id);
 
       users = await this.db.select(table, {
-        orders: [[ 'id', 'desc' ], null, 1 ],
+        orders: [
+          [ 'id', 'desc' ], null, 1,
+        ],
       });
       assert(users.length >= 2);
       assert(users[0].id > users[1].id);
@@ -555,8 +585,16 @@ describe('async.test.js', function() {
       }]);
       assert.equal(result.affectedRows, 2);
 
-      const result1 = await this.db.get(table, { name: prefix + 'fengmk2-insert00' }, { columns: [ 'gmt_create', 'gmt_modified' ] });
-      const result2 = await this.db.get(table, { name: prefix + 'fengmk2-insert01' }, { columns: [ 'gmt_create', 'gmt_modified' ] });
+      const result1 = await this.db.get(table, {
+        name: prefix + 'fengmk2-insert00',
+      }, {
+        columns: [ 'gmt_create', 'gmt_modified' ],
+      });
+      const result2 = await this.db.get(table, {
+        name: prefix + 'fengmk2-insert01',
+      }, {
+        columns: [ 'gmt_create', 'gmt_modified' ],
+      });
       assert.deepEqual(result1.gmt_create, result2.gmt_create);
       assert.deepEqual(result2.gmt_modified, result2.gmt_modified);
     });
@@ -580,39 +618,41 @@ describe('async.test.js', function() {
     });
 
     it('should insert multi rows', async function() {
-      const result = await this.db.insert(table, [
-        {
-          name: prefix + 'fengmk2-insert2',
-          email: prefix + 'm@fengmk2-insert.com',
-        },
-        {
-          name: prefix + 'fengmk2-insert3',
-          email: prefix + 'm@fengmk2-insert.com',
-        },
+      const result = await this.db.insert(table, [{
+        name: prefix + 'fengmk2-insert2',
+        email: prefix + 'm@fengmk2-insert.com',
+      },
+      {
+        name: prefix + 'fengmk2-insert3',
+        email: prefix + 'm@fengmk2-insert.com',
+      },
       ]);
       assert.equal(result.affectedRows, 2);
-      const row = await this.db.get(table, { id: result.insertId });
+      const row = await this.db.get(table, {
+        id: result.insertId,
+      });
       assert(row);
       assert.equal(row.id, result.insertId);
     });
 
     it('should insert multi fail', async function() {
       try {
-        await this.db.insert(table, [
-          {
-            name: prefix + 'fengmk2-insert4',
-            email: prefix + 'm@fengmk2-insert.com',
-          },
-          {
-            name: prefix + 'fengmk2-insert4',
-            email: prefix + 'm@fengmk2-insert.com',
-          },
+        await this.db.insert(table, [{
+          name: prefix + 'fengmk2-insert4',
+          email: prefix + 'm@fengmk2-insert.com',
+        },
+        {
+          name: prefix + 'fengmk2-insert4',
+          email: prefix + 'm@fengmk2-insert.com',
+        },
         ]);
         throw new Error('should not run this');
       } catch (err) {
         assert.equal(err.code, 'ER_DUP_ENTRY');
       }
-      const row = await this.db.get(table, { name: prefix + 'fengmk2-insert4' });
+      const row = await this.db.get(table, {
+        name: prefix + 'fengmk2-insert4',
+      });
       assert(!row);
     });
 
@@ -623,7 +663,9 @@ describe('async.test.js', function() {
       });
       assert.equal(result.affectedRows, 1);
       let rows = await this.db.select(table, {
-        where: { name: prefix + 'fengmk2-insert-no-tran' },
+        where: {
+          name: prefix + 'fengmk2-insert-no-tran',
+        },
       });
       assert.equal(rows.length, 1);
 
@@ -637,7 +679,9 @@ describe('async.test.js', function() {
         assert.equal(err.code, 'ER_DUP_ENTRY');
       }
       rows = await this.db.select(table, {
-        where: { name: prefix + 'fengmk2-insert-no-tran' },
+        where: {
+          name: prefix + 'fengmk2-insert-no-tran',
+        },
       });
       assert.equal(rows.length, 1);
     });
@@ -651,7 +695,9 @@ describe('async.test.js', function() {
         });
         assert.equal(result.affectedRows, 1);
         const rows = await tran.select(table, {
-          where: { name: prefix + 'fengmk2-insert-has-tran' },
+          where: {
+            name: prefix + 'fengmk2-insert-has-tran',
+          },
         });
         assert.equal(rows.length, 1);
 
@@ -667,7 +713,9 @@ describe('async.test.js', function() {
       }
 
       const rows = await this.db.select(table, {
-        where: { name: prefix + 'fengmk2-insert-has-tran' },
+        where: {
+          name: prefix + 'fengmk2-insert-has-tran',
+        },
       });
       assert.equal(rows.length, 0);
     });
@@ -708,7 +756,9 @@ describe('async.test.js', function() {
       const result = await this.db.update(table, user);
       assert.equal(result.affectedRows, 1);
 
-      const row = await this.db.get(table, { id: user.id });
+      const row = await this.db.get(table, {
+        id: user.id,
+      });
       assert.equal(row.email, user.email);
     });
 
@@ -747,20 +797,10 @@ describe('async.test.js', function() {
       });
       assert.equal(result.affectedRows, 1);
 
-      result = await this.db.update(table, {
-        email: prefix + 'm@fengmk2-update3.com',
-      }, {
-        where: {
-          name: prefix + 'fengmk2-update',
-          email: prefix + 'm@fengmk2-update2.com',
-        },
-      });
-      assert.equal(result.affectedRows, 1);
-
       user = await this.db.get(table, {
         name: prefix + 'fengmk2-update',
       });
-      assert.deepEqual(user.email, prefix + 'm@fengmk2-update3.com');
+      assert.deepEqual(user.email, prefix + 'm@fengmk2-update2.com');
       assert.deepEqual(new Date(user.gmt_create), new Date('2000'));
       assert(user.gmt_modified instanceof Date);
 
@@ -769,7 +809,9 @@ describe('async.test.js', function() {
         columns: [ 'email' ],
       });
       assert.equal(result.affectedRows, 1);
-      const row = await this.db.get(table, { id: user.id });
+      const row = await this.db.get(table, {
+        id: user.id,
+      });
       assert.equal(row.email, user.email);
     });
   });
@@ -825,7 +867,9 @@ describe('async.test.js', function() {
 
       const names = rows.map(item => item.name);
       let users = await this.db.select(table, {
-        where: { name: names },
+        where: {
+          name: names,
+        },
       });
 
       users = users.map((item, index) => {
@@ -838,7 +882,9 @@ describe('async.test.js', function() {
       assert.equal(result.affectedRows, 2);
 
       const rowsUpdated = await this.db.select(table, {
-        where: { name: names },
+        where: {
+          name: names,
+        },
       });
       assert.deepEqual(users.map(o => o.email), rowsUpdated.map(o => o.email));
     });
@@ -853,7 +899,9 @@ describe('async.test.js', function() {
         prefix + 'm@fengmk2-updateRows2.com',
       ];
       let users = await this.db.select(table, {
-        where: { name: names },
+        where: {
+          name: names,
+        },
       });
       assert.deepEqual(users.map(o => o.email), emails);
 
@@ -867,7 +915,9 @@ describe('async.test.js', function() {
       assert.equal(result.affectedRows, 2);
 
       users = await this.db.select(table, {
-        where: { name: names },
+        where: {
+          name: names,
+        },
       });
       assert.deepEqual(users.map(o => o.email), [
         prefix + 'm@fengmk2-updateRows-updated1.com',
@@ -888,7 +938,9 @@ describe('async.test.js', function() {
       result = await this.db.updateRows(table, users);
       assert.equal(result.affectedRows, 2);
       users = await this.db.select(table, {
-        where: { name: names },
+        where: {
+          name: names,
+        },
       });
       assert.deepEqual(users[0].gmt_create, new Date('1970'));
       assert.deepEqual(users[1].gmt_create, newGmtCreate);
@@ -938,11 +990,19 @@ describe('async.test.js', function() {
       }];
       await this.db.updateRows(table, newUsers);
       let updatedUsers = await this.db.select(table, {
-        where: { name: newUsers.map(item => item.where.name) },
+        where: {
+          name: newUsers.map(item => item.where.name),
+        },
       });
       assert.deepEqual(
-        newUsers.map(o => ({ email: o.row.email, gmt_modified: new Date(o.row.gmt_modified) })),
-        updatedUsers.map(o => ({ email: o.email, gmt_modified: new Date(o.gmt_modified) })),
+        newUsers.map(o => ({
+          email: o.row.email,
+          gmt_modified: new Date(o.row.gmt_modified),
+        })),
+        updatedUsers.map(o => ({
+          email: o.email,
+          gmt_modified: new Date(o.gmt_modified),
+        })),
       );
 
       gmtModified = new Date('2100-01-01');
@@ -959,11 +1019,19 @@ describe('async.test.js', function() {
       await this.db.updateRows(table, newUsers);
 
       updatedUsers = await this.db.select(table, {
-        where: { name: newUsers.map(item => item.where.name) },
+        where: {
+          name: newUsers.map(item => item.where.name),
+        },
       });
       assert.deepEqual(
-        newUsers.map(o => ({ email: o.row.email, gmt_modified: new Date(o.row.gmt_modified) })),
-        updatedUsers.map(o => ({ email: o.email, gmt_modified: new Date(o.gmt_modified) })),
+        newUsers.map(o => ({
+          email: o.row.email,
+          gmt_modified: new Date(o.row.gmt_modified),
+        })),
+        updatedUsers.map(o => ({
+          email: o.email,
+          gmt_modified: new Date(o.gmt_modified),
+        })),
       );
     });
   });
@@ -985,16 +1053,22 @@ describe('async.test.js', function() {
     });
 
     it('should delete exists rows', async function() {
-      const result = await this.db.delete(table, { email: prefix + 'm@fengmk2-delete.com' });
+      const result = await this.db.delete(table, {
+        email: prefix + 'm@fengmk2-delete.com',
+      });
       assert.equal(result.affectedRows, 2);
       assert.equal(result.insertId, 0);
 
-      const user = await this.db.get(table, { email: prefix + 'm@fengmk2-delete.com' });
+      const user = await this.db.get(table, {
+        email: prefix + 'm@fengmk2-delete.com',
+      });
       assert(!user);
     });
 
     it('should delete not exists rows', async function() {
-      const result = await this.db.delete(table, { email: prefix + 'm@fengmk2-delete-not-exists.com' });
+      const result = await this.db.delete(table, {
+        email: prefix + 'm@fengmk2-delete-not-exists.com',
+      });
       assert.equal(result.affectedRows, 0);
       assert.equal(result.insertId, 0);
     });
@@ -1066,7 +1140,9 @@ describe('async.test.js', function() {
       });
       assert.equal(count, 2);
 
-      count = await this.db.count(table, { id: -1 });
+      count = await this.db.count(table, {
+        id: -1,
+      });
       assert.equal(count, 0);
     });
   });
