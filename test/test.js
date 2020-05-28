@@ -121,18 +121,34 @@ const updateRows = op.updateRows('tableName', [
 
 console.log('update', updateRows);
 
-const insertOrUpdate = op.insertOrUpdate(
+// const insertOrUpdate = op.insertOrUpdate(
+//   'tableName',
+//   {
+//     name: 'cxc',
+//     id: 1
+//   },
+//   {
+//     columns: ['name', 'id', 'age'],
+//     where: {
+//       name: 1
+//     }
+//   }
+// );
+
+// console.log('insertOrUpdate', insertOrUpdate);
+
+
+const updateUnSafe = op.updateUnSafe(
   'tableName',
   {
     name: 'cxc',
     id: 1
   },
   {
-    columns: ['name', 'id', 'age'],
     where: {
       name: 1
     }
   }
 );
 
-console.log('insertOrUpdate', insertOrUpdate);
+console.log('updateUnSafe', updateUnSafe);
